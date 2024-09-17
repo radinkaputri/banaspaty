@@ -101,8 +101,8 @@ async def get_user_settings(from_user):
 
     buttons.ibutton("Close", f"userset {user_id} close")
 
-    text = f"""
-<u>User Settings of {name}</u>
+   text = f"""
+<b><i>User Settings Overview ({name})</i></b>
 
 <code>TG Premium Status:</code> <b>{IS_PREMIUM_USER}</b>
 
@@ -114,13 +114,9 @@ async def get_user_settings(from_user):
 <code>Thumbnail        :</code> <b>{thumbmsg}</b>
 <code>Media Group      :</code> <b>{media_group}</b>
 
-<code>YT-DLP Options   :</code> <b>{escape(ytopt)}</b>
-<code>Rclone Config    :</code> <b>{rccmsg}</b>
-
-<code>User Dump        :</code> <b>{user_dump}</b>
-<code>Remove Unwanted  :</code> <b>{lremname}</b>
+<b>Some information is hidden for your security. Open menu below for more details.</b>
 """
-    return text, buttons.build_menu(1)
+return text, buttons.build_menu(2)
 
 
 async def update_user_settings(query):
@@ -128,7 +124,7 @@ async def update_user_settings(query):
     user_id = query.from_user.id
     tpath = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(tpath):
-        tpath = "https://graph.org/file/25545597de34c640b31d6.jpg"
+        tpath = "https://raw.githubusercontent.com/xyrad-bot/xyrad/main/images/_1b942b72-7e14-4eac-bb5e-d7ae4992a36d.jpeg"
     await query.message.edit_media(
         media=InputMediaPhoto(media=tpath, caption=msg), reply_markup=button)
 
@@ -138,7 +134,7 @@ async def user_settings(_, message):
     user_id = message.from_user.id
     tpath = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(tpath):
-        tpath = "https://graph.org/file/25545597de34c640b31d6.jpg"
+        tpath = "https://raw.githubusercontent.com/xyrad-bot/xyrad/main/images/_1b942b72-7e14-4eac-bb5e-d7ae4992a36d.jpeg"
     usetMsg = await message.reply_photo(tpath, caption=msg, reply_markup=button)
     await auto_delete_message(message, usetMsg)
 

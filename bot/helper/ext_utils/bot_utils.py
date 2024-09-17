@@ -101,7 +101,7 @@ def bt_selection_buttons(id_, isCanCncl=True):
 
 async def get_telegraph_list(telegraph_content):
     path = [(await telegraph.create_page(
-        title='Z Drive Search', content=content))["path"] for content in telegraph_content]
+        title='xyrad drive search', content=content))["path"] for content in telegraph_content]
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
@@ -136,42 +136,42 @@ def get_readable_message():
             tag = download.message.from_user.mention if download.message.from_user else "Anonymous"
         elapsed = time() - download.extra_details['startTime']
         if config_dict['DELETE_LINKS'] and int(config_dict['AUTO_DELETE_MESSAGE_DURATION']) > 0:
-            msg += f"\n<b>File Name</b> » <i>{escape(f'{download.name()}')}</i>\n\n" if elapsed <= config_dict['AUTO_DELETE_MESSAGE_DURATION'] else ""
+            msg += f"<pre>{escape(f'{download.name()}')}</pre>\n" if elapsed <= config_dict['AUTO_DELETE_MESSAGE_DURATION'] else "<pre>On Going Task...</pre>\n"
         else:
-            msg += f"\n<b>File Name</b> » <i>{escape(f'{download.name()}')}</i>\n\n"
-        msg += f"⌑ <b>{download.status()}</b>"
+            msg += f"<pre>{escape(f'{download.name()}')}</pre>\n"
         if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_PAUSED,
                                      MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP]:
-            msg += f" » {download.speed()}"
-            msg += f"\n⌑ {get_progress_bar_string(download.progress())} » {download.progress()}"
-            msg += f"\n⌑ <code>Done   </code>: {download.processed_bytes()} of {download.size()}"
-            msg += f"\n⌑ <code>ETA    </code>: {download.eta()}"
-            msg += f"\n⌑ <code>Past   </code>: {get_readable_time(elapsed)}"
-            msg += f"\n⌑ <code>ENG    </code>: {download.engine}"
+            progress = get_progress_bar_string(download.progress())
+            msg += (f"\n{progress} » <b><i>{download.progress()}</i></b>"
+                    f"\n<code>Status :</code> <b>{download.status()}</b>"
+                    f"\n<code>Done   :</code> {download.processed_bytes()} of {download.size()}"
+                    f"\n<code>Speed  :</code> {download.speed()}"
+                    f"\n<code>ETA    :</code> {download.eta()}"
+                    f"\n<code>User   :</code> <b>{tag}</b>"
+                    f"\n<code>Engine :</code> <b><i>{download.engine}</i></b>")
             if hasattr(download, 'playList'):
                 try:
-                    if playlist:=download.playList():
-                        msg += f"\n⌑ <code>YtList </code>: {playlist}"
+                    if playlist := download.playList():
+                        msg += f"\n<code>YtList :</code> {playlist}"
                 except:
                     pass
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\n⌑ <code>S/L    </code>: {download.seeders_num()}/{download.leechers_num()}"
+                    msg += f"\n<code>S/L    :</code> {download.seeders_num()}/{download.leechers_num()}"
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            msg += f"\n⌑ <code>Size     </code>» {download.size()}"
-            msg += f"\n⌑ <code>Speed    </code>» {download.upload_speed()}"
-            msg += f"\n⌑ <code>Uploaded </code>» {download.uploaded_bytes()}"
-            msg += f"\n⌑ <code>Ratio    </code>» {download.ratio()}"
-            msg += f"\n⌑ <code>Time     </code>» {download.seeding_time()}"
+            msg += (f"\n<code>Size   : </code>{download.size()}"
+                    f"\n<code>Speed  : </code>{download.upload_speed()}"
+                    f"\n<code>Uploaded : </code>{download.uploaded_bytes()}"
+                    f"\n<code>Ratio  : </code>{download.ratio()}"
+                    f"\n<code>Time   : </code>{download.seeding_time()}")
         else:
-            msg += f"\n⌑ <code>Size   </code>: {download.size()}"
-        if config_dict['DELETE_LINKS']:
-            msg += f"\n⌑ <code>Task   </code>: {download.extra_details['mode']}"
-        else:
-            msg += f"\n⌑ <code>Task   </code>: <a href='{download.message.link}'>{download.extra_details['mode']}</a>"
-        msg += f"\n⌑ <code>User   </code>: {tag}"
+            msg += (f"\n<code>Status :</code> <b>{download.status()}</b>"
+                    f"\n<code>Size   :</code> {download.size()}"
+                    f"\n<code>Past   :</code> {get_readable_time(elapsed)}"
+                    f"\n<code>User   :</code> <b>{tag}</b>"
+                    f"\n<code>Engine :</code> {download.engine}")
         msg += f"\n⚠️ /{BotCommands.CancelMirror}_{download.gid()}\n\n"
     if len(msg) == 0:
         return None, None
