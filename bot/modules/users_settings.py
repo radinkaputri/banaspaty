@@ -36,72 +36,53 @@ async def get_user_settings(from_user):
     thumbpath   = f"Thumbnails/{user_id}.jpg"
     rclone_path = f'rcl/{user_id}.conf'
     user_dict   = user_data.get(user_id, {})
+
+    # Set leech type button
     if user_dict.get('as_doc', False) or 'as_doc' not in user_dict and config_dict['AS_DOCUMENT']:
         ltype = "DOCUMENT"
-        buttons.ibutton("Send As Media", f"userset {user_id} doc")
+        buttons.ibutton("Send as Media", f"userset {user_id} doc")
     else:
         ltype = "MEDIA"
-        buttons.ibutton("Send As Document", f"userset {user_id} doc")
+        buttons.ibutton("Send as Document", f"userset {user_id} doc")
 
+    # Set other buttons
     buttons.ibutton("Leech Splits", f"userset {user_id} lss")
-    split_size = user_dict.get(
-        'split_size', False) or config_dict['LEECH_SPLIT_SIZE']
+    split_size = user_dict.get('split_size', False) or config_dict['LEECH_SPLIT_SIZE']
     split_size = get_readable_file_size(split_size)
 
-    if user_dict.get('equal_splits', False) or 'equal_splits' not in user_dict and config_dict['EQUAL_SPLITS']:
-        equal_splits = 'Enabled'
-    else:
-        equal_splits = 'Disabled'
+    equal_splits = 'Enabled' if user_dict.get('equal_splits', False) or 'equal_splits' not in user_dict and config_dict['EQUAL_SPLITS'] else 'Disabled'
+    media_group = 'Enabled' if user_dict.get('media_group', False) or 'media_group' not in user_dict and config_dict['MEDIA_GROUP'] else 'Disabled'
 
-    if user_dict.get('media_group', False) or 'media_group' not in user_dict and config_dict['MEDIA_GROUP']:
-        media_group = 'Enabled'
-    else:
-        media_group = 'Disabled'
-
-    buttons.ibutton("YT-DLP Options", f"userset {user_id} yto")
-    if user_dict.get('yt_opt', False):
-        ytopt = user_dict['yt_opt']
-    elif 'yt_opt' not in user_dict and (YTO := config_dict['YT_DLP_OPTIONS']):
-        ytopt = YTO
-    else:
-        ytopt = 'None'
+    buttons.ibutton("YT-DLP Opt.", f"userset {user_id} yto")
+    ytopt = user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', 'None'))
 
     buttons.ibutton("Leech Prefix", f"userset {user_id} lprefix")
-    if user_dict.get('lprefix', False):
-        lprefix = user_dict['lprefix']
-    elif 'lprefix' not in user_dict and (LP := config_dict['LEECH_FILENAME_PREFIX']):
-        lprefix = LP
-    else:
-        lprefix = 'None'
+    lprefix = user_dict.get('lprefix', config_dict.get('LEECH_FILENAME_PREFIX', 'None'))
 
     buttons.ibutton("Thumbnail", f"userset {user_id} sthumb")
     thumbmsg = "Exists" if await aiopath.exists(thumbpath) else "Not Exists"
 
     buttons.ibutton("Rclone", f"userset {user_id} rcc")
     rccmsg = "Exists" if await aiopath.exists(rclone_path) else "Not Exists"
-
+    
+    # User Dump Button
     buttons.ibutton("User Dump", f"userset {user_id} user_dump")
     if user_dict.get('user_dump', False):
         user_dump = user_dict['user_dump']
     elif 'user_dump' not in user_dict and (UD := config_dict['USER_DUMP']):
         user_dump = UD
     else:
-        user_dump = 'None'
+        user_dump = 'Hidden'
 
-    buttons.ibutton("Leech Remove Unwanted", f"userset {user_id} lremname")
-    if user_dict.get('lremname', False):
-        lremname = user_dict['lremname']
-    elif 'lremname' not in user_dict and (LRU := config_dict['LEECH_REMOVE_UNWANTED']):
-        lremname = LRU
-    else:
-        lremname = 'None'
+    buttons.ibutton("Blacklist Words", f"userset {user_id} lremname")
+    lremname = user_dict.get('lremname', config_dict.get('LEECH_REMOVE_UNWANTED', 'None'))
 
-    if user_dict:
-        buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
+    # Add Reset and Close buttons to footer
+    buttons.ibutton("Reset", f"userset {user_id} reset_all", position="footer")
+    buttons.ibutton("Close", f"userset {user_id} close", position="footer")
 
-    buttons.ibutton("Close", f"userset {user_id} close")
-
-   text = f"""
+    # Generate text message
+    text = f"""
 <b><i>User Settings Overview ({name})</i></b>
 
 <code>TG Premium Status:</code> <b>{IS_PREMIUM_USER}</b>
@@ -114,9 +95,10 @@ async def get_user_settings(from_user):
 <code>Thumbnail        :</code> <b>{thumbmsg}</b>
 <code>Media Group      :</code> <b>{media_group}</b>
 
-<b>Some information is hidden for your security. Open menu below for more details.</b>
+<b>This bot is powered by Zyradaex Leech. Channel: @xyradelw</b>
 """
-return text, buttons.build_menu(2)
+
+    return text, buttons.build_menu(1)
 
 
 async def update_user_settings(query):
@@ -124,7 +106,7 @@ async def update_user_settings(query):
     user_id = query.from_user.id
     tpath = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(tpath):
-        tpath = "https://raw.githubusercontent.com/xyrad-bot/xyrad/main/images/_1b942b72-7e14-4eac-bb5e-d7ae4992a36d.jpeg"
+        tpath = "https://raw.githubusercontent.com/xyrad-bot/xyrad/main/images/IMG_20240917_233726_757.jpg"
     await query.message.edit_media(
         media=InputMediaPhoto(media=tpath, caption=msg), reply_markup=button)
 
@@ -134,7 +116,7 @@ async def user_settings(_, message):
     user_id = message.from_user.id
     tpath = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(tpath):
-        tpath = "https://raw.githubusercontent.com/xyrad-bot/xyrad/main/images/_1b942b72-7e14-4eac-bb5e-d7ae4992a36d.jpeg"
+        tpath = "https://raw.githubusercontent.com/xyrad-bot/xyrad/main/images/IMG_20240917_233726_757.jpg"
     usetMsg = await message.reply_photo(tpath, caption=msg, reply_markup=button)
     await auto_delete_message(message, usetMsg)
 
