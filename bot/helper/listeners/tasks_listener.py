@@ -476,24 +476,24 @@ class MirrorLeechListener:
                 buttons = ButtonMaker()
                 if link:
                     if link.startswith("https://drive.google.com/") and not config_dict['DISABLE_DRIVE_LINK']:
-                        buttons.ubutton("Drive Link", link, "header")
+                        buttons.ubutton("♻️ Drive Link", link)
                     elif not link.startswith("https://drive.google.com/"):
-                        buttons.ubutton("Cloud Link", link, "header")
+                        buttons.ubutton("☁️ Cloud Link", link)
                 if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
                     remote, path = rclonePath.split(':', 1)
                     url_path = url_quote(f'{path}')
                     share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                    buttons.ubutton("Rclone Link", share_url)
+                    buttons.ubutton("🔗 Rclone Link", share_url)
                 elif not rclonePath:
                     INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                     if INDEX_URL:
                         share_url = f"{INDEX_URL}findpath?id={dir_id}"
                         if mime_type == "Folder":
-                            buttons.ubutton("Direct Link", share_url)
+                            buttons.ubutton("📁 Direct Link", share_url)
                         else:
-                            buttons.ubutton("Direct Link", share_url)
+                            buttons.ubutton("🔗 Direct Link", share_url)
                             if mime_type.startswith(("image", "video", "audio")):
                                 share_urls = f"{INDEX_URL}findpath?id={dir_id}&view=true"
                                 buttons.ubutton("🌐 View Link", share_urls)
