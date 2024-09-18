@@ -144,7 +144,8 @@ def get_readable_message():
             progress = get_progress_bar_string(download.progress())
             msg += (f"\n{progress} » <b><i>{download.progress()}</i></b>"
                     f"\n<code>Status :</code> <b>{download.status()}</b>"
-                    f"\n<code>Done   :</code> {download.processed_bytes()} of {download.size()}"
+                    f"\n<code>Size   :</code> {download.size()}"
+                    f"\n<code>Done   :</code> {download.processed_bytes()}"
                     f"\n<code>Speed  :</code> {download.speed()}"
                     f"\n<code>ETA    :</code> {download.eta()}"
                     f"\n<code>User   :</code> <b>{tag}</b>"
